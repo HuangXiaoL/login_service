@@ -1,9 +1,15 @@
 [http]
 address = "127.0.0.1:8082"
-[mysql]
+[user_mysql]
 user_name="user"
 password="x55NKxZMraHRXChX"
 ip="10.0.2.252"
 port="3306"
 db_name="user"
 max_conn=10
+[user_redis]
+ip="10.0.2.252"
+port="6379"
+max_idle=16
+max_active=32
+idle_timeout=120

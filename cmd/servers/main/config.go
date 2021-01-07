@@ -5,6 +5,10 @@ import (
 	"io/ioutil"
 	"os"
 
+	"gitlab.haochang.tv/huangxiaolei/login_service/pkg/redis/user_redis"
+
+	"gitlab.haochang.tv/huangxiaolei/login_service/pkg/mysql/user_model"
+
 	"github.com/sirupsen/logrus"
 
 	"github.com/BurntSushi/toml"
@@ -17,14 +21,8 @@ type Config struct {
 	HTTP struct {
 		Address string `toml:"address"`
 	} `toml:"http"`
-	Mysql struct {
-		UserName string `toml:"user_name"`
-		Password string `toml:"password"`
-		IP       string `toml:"ip"`
-		Port     string `toml:"port"`
-		DbName   string `toml:"db_name"`
-		MaxConn  int    `toml:"max_conn"`
-	} `toml:"mysql"`
+	user_model.Mysql `toml:"user_mysql"` //用户数据库的连接MySQL需要的结构参数
+	user_redis.Redis `toml:"user_redis"` //用户数据库的连接MySQL需要的结构参数
 }
 
 //loadConfigFile 配置文件相关信息载入进来 add 配置文件的路径
@@ -50,9 +48,4 @@ func loadFile(file string) error {
 	}
 
 	return toml.Unmarshal(data, &cfg)
-}
-
-// Get 获得系统配置
-func Get() Config {
-	return cfg
 }

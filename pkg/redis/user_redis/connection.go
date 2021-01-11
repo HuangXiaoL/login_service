@@ -1,33 +1,42 @@
 package user_redis
 
 import (
-	"time"
+	"fmt"
 
-	"github.com/garyburd/redigo/redis"
+	"github.com/go-redis/redis"
 )
 
 type Redis struct {
-	IP          string        `toml:"ip"`
-	Port        string        `toml:"port"`
-	MaxIdle     int           `toml:"max_idle"`
-	MaxActive   int           `toml:"max_active"`
-	IdleTimeout time.Duration `toml:"idle_timeout"`
+	IP           string `toml:"ip"`
+	Port         int    `toml:"port"`
+	Password     string `toml:"password"`
+	DB           int    `toml:"db"`
+	PoolSize     int    `toml:"pool_size"`
+	MinIdleConns int    `toml:"min_idle_conns"`
 }
 
 var (
-	Pool redis.Pool
-	conn redis.Conn
+	client *redis.Client
+	Nil    = redis.Nil
 )
 
 //initRedis 初始化Redis
 func InitRedis(r Redis) (err error) {
-	Pool = redis.Pool{
-		MaxIdle:     r.MaxIdle,
-		MaxActive:   r.MaxActive,
-		IdleTimeout: r.IdleTimeout,
-		Dial: func() (redis.Conn, error) {
-			return redis.Dial("tcp", r.IP+":"+r.Port)
-		},
+	client = redis.NewClient(&redis.Options{
+		Addr:         fmt.Sprintf("%s:%d", r.IP, r.Port),
+		Password:     r.Password, // no password set
+		DB:           r.DB,       // use default DB
+		PoolSize:     r.PoolSize,
+		MinIdleConns: r.MinIdleConns,
+	})
+
+	_, err = client.Ping().Result()
+	if err != nil {
+		return err
 	}
-	return err
+	return nil
+}
+
+func Close() {
+	_ = client.Close()
 }

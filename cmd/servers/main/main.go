@@ -66,6 +66,7 @@ func initLink(c *Config) {
 	if err := http.ListenAndServe(c.HTTP.Address, user_web.NewRouter()); err != nil {
 		logrus.WithError(err).Panic("Web服务初始化.....失败")
 	}
+	user_redis.Close()
 }
 
 func main() {

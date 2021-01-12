@@ -22,8 +22,9 @@ func RegisterUserInfo(w http.ResponseWriter, r *http.Request) {
 	}
 	logrus.Printf("%+v", req)
 	//2.数据处理
-	u := &realize_logic.User{}
-	u.RegisterInfo(req)
+	if err := realize_logic.RegisterInfo(req); err != nil { //查到了数据 ，证明该邮箱已经被注册了，下行错误代码 409
+		httpkit.WrapError(err).WithStatus(http.StatusConflict).Panic()
+	}
 
 	//3.结果下行
 }

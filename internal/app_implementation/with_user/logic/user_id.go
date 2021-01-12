@@ -3,8 +3,9 @@ package logic
 import (
 	"crypto/md5"
 	"fmt"
+	"reflect"
 
-	"github.com/sirupsen/logrus"
+	"gitlab.haochang.tv/huangxiaolei/login_service/internal/app_implementation/with_user/model"
 
 	"github.com/go-basic/uuid"
 	"gitlab.haochang.tv/huangxiaolei/login_service/internal/app_structure/with_user_structure/logic"
@@ -18,17 +19,17 @@ type User struct {
 	Email        string //用户邮箱
 }
 
-var (
-	_ logic.UserBehavior = (*User)(nil)
-)
-
 //RegisterInfo 注册用户数据出来
-func (u *User) RegisterInfo(r logic.Register) (err error) {
+func RegisterInfo(r logic.Register) (err error) {
+	u := User{}
 	u.UserID = uuid.New()
 	u.Email = r.Email
 	u.PasswordSalt = uuid.New()
 	u.Password = u.passwordSaltDispose(r.Password)
-	logrus.Printf("%+v", u)
+	userInfo := u.structToMapDemo()
+	if err := model.UserInfo(userInfo); err != nil {
+		return err
+	}
 	return
 }
 
@@ -37,4 +38,14 @@ func (u *User) passwordSaltDispose(p string) string {
 	data := []byte(p + u.PasswordSalt)
 	has := md5.Sum(data)
 	return fmt.Sprintf("%x", has)
+}
+
+func (u User) structToMapDemo() map[string]interface{} {
+	obj1 := reflect.TypeOf(u)
+	obj2 := reflect.ValueOf(u)
+	var data = make(map[string]interface{})
+	for i := 0; i < obj1.NumField(); i++ {
+		data[obj1.Field(i).Name] = obj2.Field(i).Interface()
+	}
+	return data
 }

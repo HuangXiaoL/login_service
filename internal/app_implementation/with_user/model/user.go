@@ -5,33 +5,50 @@ import (
 	"strconv"
 
 	"github.com/sirupsen/logrus"
+
+	"gitlab.haochang.tv/huangxiaolei/login_service/internal/app_structure/with_user_structure/model"
+
 	"gitlab.haochang.tv/huangxiaolei/login_service/pkg/mysql/user_model"
 )
 
-func UserInfo(u map[string]interface{}) error {
+//Register 注册
+func Register(u map[string]interface{}) error {
 	//组装数据
-	//logrus.Println(u)
-	uinfo := user_model.UserInfo{}
-	uinfo.Password = TypeJudgment(u["Password"])
-	uinfo.PasswordSalt = TypeJudgment(u["PasswordSalt"])
-	uinfo.UserID = TypeJudgment(u["UserID"])
-	uinfo.Email = TypeJudgment(u["Email"])
-	//logrus.Printf("%+v", uinfo)
-
-	//查询用户是否存在
-	us, err := uinfo.SelectUserInfoByEmail()
-	if err == nil { //用户存在返回错误信息改用户存在
-		return err
-
-	}
-	logrus.Printf("%+v", us)
+	logrus.Println(u)
+	uinfo := user_model.Get()
+	uinfo.Password = typeJudgment(u["Password"])
+	uinfo.PasswordSalt = typeJudgment(u["PasswordSalt"])
+	uinfo.UserID = typeJudgment(u["UserID"])
+	uinfo.Email = typeJudgment(u["Email"])
 	//创建用户
-	//if err := uinfo.CreateUserInfo(); err != nil {
-	//	return err
-	//}
+	logrus.Printf("%+v", uinfo)
+	if err := uinfo.CreateUserInfo(); err != nil {
+		return err
+	}
 	return nil
 }
-func TypeJudgment(value interface{}) string {
+
+//LoginSalt 设置登录盐 session salt
+func LoginSalt(e string, salt string) {
+	uinfo := user_model.Get()
+	uinfo.Email = e
+	uinfo.SessionSalt = salt
+	uinfo.CreateUserLoginInfoByEmail()
+}
+
+//FindUserBuyEmail 查询用户，根据用户邮箱
+func FindUserBuyEmail(email string) (model.UserInfo, error) {
+	uinfo := user_model.UserInfo{}
+	uinfo.Email = email
+	us, err := uinfo.SelectUserInfoByEmail()
+	if err != nil { //不存在返回错误信息
+		return model.UserInfo{}, err
+	}
+	return us, nil
+}
+
+//typeJudgment 类型断言
+func typeJudgment(value interface{}) string {
 	var key string
 	if value == nil {
 		return key

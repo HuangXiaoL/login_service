@@ -2,6 +2,7 @@ package service
 
 import (
 	"net/http"
+	"time"
 
 	realize_logic "gitlab.haochang.tv/huangxiaolei/login_service/internal/app_implementation/with_user/logic"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/joyparty/httpkit"
 )
 
+const COOKIE_MAX_MAX_AGE = int(time.Hour * 24 * 7 / time.Second) //7*24 小时 单位：秒。
 //RegisterUserInfo 注册用户
 func RegisterUserInfo(w http.ResponseWriter, r *http.Request) {
 	//1.上传参数赋值
@@ -20,7 +22,6 @@ func RegisterUserInfo(w http.ResponseWriter, r *http.Request) {
 	if err := httpkit.ScanValues(&req, r.PostForm); err != nil { //绑定参数
 		httpkit.WrapError(err).WithHeader("err", "Incorrect parameter, missing parameter, parameter content, or type").WithStatus(http.StatusBadRequest).Panic()
 	}
-	logrus.Printf("%+v", req)
 	//2.数据处理
 	//执行注册流程
 	u := realize_logic.User{}
@@ -38,6 +39,42 @@ func RegisterUserInfo(w http.ResponseWriter, r *http.Request) {
 	}
 	//3.结果下行
 	// 注册成功，登录成功，下发cookie
-	w.Header().Set("json_web_token", token)
+	maxAge := int(60 * 15 * time.Second) //15分钟
+	uc := &http.Cookie{
+		Name:   "token",
+		Value:  token,
+		MaxAge: maxAge,
+	}
+	http.SetCookie(w, uc)
+	w.WriteHeader(http.StatusCreated)
+}
+
+//UserLogin 用户登录
+func UserLogin(w http.ResponseWriter, r *http.Request) {
+	//1.上传参数赋值
+	req := struct_logic.Login{}
+	_ = r.ParseForm()
+	if err := httpkit.ScanValues(&req, r.PostForm); err != nil { //绑定参数
+		httpkit.WrapError(err).WithHeader("err", "Incorrect parameter, missing parameter, parameter content, or type").WithStatus(http.StatusBadRequest).Panic()
+	}
+	//2.数据处理
+	logrus.Printf("%+v", req)
+	u := realize_logic.User{}
+	token, err := u.Login(req, 0)
+	if err != nil { // 登录失败。
+		logrus.Println(err)
+		httpkit.WrapError(err).WithStatus(http.StatusUnauthorized).Panic()
+	}
+	maxAge := int(60 * time.Second)
+	if req.Remember == 1 {
+		maxAge = COOKIE_MAX_MAX_AGE // 七天
+	}
+	//3.结果下行
+	uc := &http.Cookie{
+		Name:   "token",
+		Value:  token,
+		MaxAge: maxAge,
+	}
+	http.SetCookie(w, uc)
 	w.WriteHeader(http.StatusCreated)
 }

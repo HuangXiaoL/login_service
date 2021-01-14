@@ -16,6 +16,7 @@ func NewRouter() *chi.Mux {
 	r.Use(httpkit.Recoverer(hl))
 
 	r.With(Logruser).Post(`/register`, service.RegisterUserInfo)
+	r.With(Logruser).Post(`/login`, service.UserLogin)
 
 	return r
 }

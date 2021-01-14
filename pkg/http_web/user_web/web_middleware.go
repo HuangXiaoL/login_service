@@ -17,7 +17,7 @@ func Logruser(next http.Handler) http.Handler {
 		endTime := time.Since(start)
 		RequestTheAddress := r.RequestURI
 		RequestTheHost := r.RemoteAddr
-		logrus.Printf("Request The Address =%s，Request The Host =%s，This http  request dispose use time is %s", RequestTheAddress, RequestTheHost, endTime)
+		logrus.Printf("Request The Address =%s，Request The Host =%s，This http  request dispose use time is %s，now time is %s", RequestTheAddress, RequestTheHost, endTime, time.Now())
 	})
 
 }

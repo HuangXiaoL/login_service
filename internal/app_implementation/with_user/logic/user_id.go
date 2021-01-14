@@ -2,6 +2,7 @@ package logic
 
 import (
 	"crypto/md5"
+	"errors"
 	"fmt"
 	"reflect"
 
@@ -52,7 +53,21 @@ func (u *User) Login(login logic.Login, way int) (s string, err error) {
 		return
 	}
 	//正常登录流程
-	//jwt.GenToken()
+	uInfo, err := model.FindUserBuyEmail(login.Email)
+	if err != nil { //账号不存在
+		return
+	}
+	u.PasswordSalt = uInfo.PasswordSalt
+	if uInfo.Password != u.passwordSaltDispose(login.Password) { //提交的密码与数据库记录密码不一致
+		return "", errors.New("Incorrect account or password")
+	}
+	s, err = jwt.GenToken(u.UserID, []byte(sSalt), 1)
+	if err != nil {
+		return
+	}
+	if err = model.LoginSalt(login.Email, sSalt); err != nil {
+		return
+	}
 	return
 }
 

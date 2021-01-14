@@ -46,7 +46,9 @@ func (u *User) Login(login logic.Login, way int) (s string, err error) {
 		if err != nil {
 			return
 		}
-		model.LoginSalt(login.Email, sSalt)
+		if err = model.LoginSalt(login.Email, sSalt); err != nil {
+			return
+		}
 		return
 	}
 	//正常登录流程

@@ -31,6 +31,13 @@ func RegisterUserInfo(w http.ResponseWriter, r *http.Request) {
 	//执行登录流程,生成session salt，下行201
 	l := struct_logic.Login{}
 	l.Email = u.Email
-	u.Login(l, 1) //way 参数为1 不需要效验账号密码，直接登录
+	token, err := u.Login(l, 1) //way 参数为1 不需要效验账号密码，直接登录
+	if err != nil {             //注册成功 登录失败。返回200 跳转到登录接口进行登录
+		logrus.Println(err)
+		httpkit.WrapError(err).WithStatus(http.StatusOK).Panic()
+	}
 	//3.结果下行
+	// 注册成功，登录成功，下发cookie
+	w.Header().Set("json_web_token", token)
+	w.WriteHeader(http.StatusCreated)
 }

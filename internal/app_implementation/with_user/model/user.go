@@ -29,11 +29,14 @@ func Register(u map[string]interface{}) error {
 }
 
 //LoginSalt 设置登录盐 session salt
-func LoginSalt(e string, salt string) {
+func LoginSalt(e string, salt string) (err error) {
 	uinfo := user_model.Get()
 	uinfo.Email = e
 	uinfo.SessionSalt = salt
-	uinfo.CreateUserLoginInfoByEmail()
+	if err = uinfo.CreateUserLoginInfoByEmail(); err != nil {
+		return err
+	}
+	return
 }
 
 //FindUserBuyEmail 查询用户，根据用户邮箱

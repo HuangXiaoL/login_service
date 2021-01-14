@@ -11,6 +11,6 @@ type UserInfo struct {
 //Account 账号信息操作相关接口
 type AccountInformation interface {
 	CreateUserInfo() error                    // 注册用户信息
-	CreateUserLoginInfoByEmail()              //登录状态 session salt 创建
+	CreateUserLoginInfoByEmail() (err error)  //登录状态 session salt 创建
 	SelectUserInfoByEmail() (UserInfo, error) //查询用户信息
 }

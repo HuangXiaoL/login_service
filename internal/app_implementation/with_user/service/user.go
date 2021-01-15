@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"net/http"
 	"time"
 
@@ -66,40 +67,35 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 
 //UserLoginOut 用户退出登录
 func UserLoginOut(w http.ResponseWriter, r *http.Request) {
+	if err := authenticationToken(r); err != nil {
+		logrus.Info(err)
+		httpkit.WrapError(err).WithStatus(http.StatusBadRequest).Panic()
+	}
+	//3.处理下行
 	t, _ := r.Cookie("token")
 	u, _ := r.Cookie("uid")
-	us := &realize_logic.User{}
-	logrus.Println(t.Value)
-	logrus.Println(u.Value)
-	us.UserID = u.Value
-	if err := us.LoginOut(t.Value); err != nil {
-		logrus.Info(err)
-		httpkit.WrapError(err).WithStatus(http.StatusForbidden).Panic()
-	}
-	logrus.Info(321312312312)
 	loginOutDeleteCookie(w, t)
 	loginOutDeleteCookie(w, u)
 	w.WriteHeader(http.StatusResetContent)
 }
 
-//loginSuccessfullyIssuedCookie 登录成功下发cookie数据
-func loginSuccessfullyIssuedCookie(w http.ResponseWriter, name string, value string, remember int) {
-	maxAge := int(60 * time.Second)
-	if remember == 1 {
-		maxAge = COOKIE_MAX_MAX_AGE // 七天
-	}
-	//3.结果下行
-	cookie := &http.Cookie{
-		Name:   name,
-		Value:  value,
-		MaxAge: maxAge,
-	}
-	http.SetCookie(w, cookie)
-}
+//NewPassword 修改密码
+func NewPassword(w http.ResponseWriter, r *http.Request) {
 
-//loginOutDeleteCookie 退出登录删除cookie
-func loginOutDeleteCookie(w http.ResponseWriter, cookie *http.Cookie) {
-	cookie.Value = ""
-	cookie.MaxAge = 0
-	http.SetCookie(w, cookie)
+	if err := authenticationToken(r); err != nil {
+		logrus.Info(err)
+		httpkit.WrapError(err).WithStatus(http.StatusBadRequest).Panic()
+	}
+	//获得参数
+	req := struct_logic.ChangePassword{}
+	_ = r.ParseForm()
+	if err := httpkit.ScanValues(&req, r.PostForm); err != nil { //绑定参数
+		httpkit.WrapError(err).WithHeader("err", "Incorrect parameter, missing parameter, parameter content, or type").WithStatus(http.StatusBadRequest).Panic()
+	}
+	err := json.NewDecoder(r.Body).Decode(&req) // 解析json 赋值结构体
+	if err != nil {
+
+	}
+	//处理参数
+	//下行结果
 }

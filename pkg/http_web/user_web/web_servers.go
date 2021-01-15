@@ -18,6 +18,7 @@ func NewRouter() *chi.Mux {
 	r.With(Logruser).Post(`/register`, service.RegisterUserInfo)
 	r.With(Logruser).Post(`/login`, service.UserLogin)
 	r.With(LoginAuth).Delete(`/login`, service.UserLoginOut)
+	r.With(LoginAuth).Delete(`/my/password`, service.NewPassword)
 
 	return r
 }

@@ -72,8 +72,8 @@ func (u *User) Login(login logic.Login, way int) (s string, err error) {
 	return
 }
 
-//LoginOut 退出登录
-func (u *User) LoginOut(token string) (err error) {
+//VerifyTheUser 验证用户
+func (u *User) VerifyTheUser(token string) (err error) {
 	uInfo, err := model.FindUserBuyUID(u.UserID)
 	if err != nil { //未查询到该用户
 		return
@@ -87,6 +87,11 @@ func (u *User) LoginOut(token string) (err error) {
 		return
 	}
 	return
+}
+
+//MyPassword 处理自己的密码 newPWD 新密码
+func (u *User) MyPassword(newPWD string) {
+
 }
 
 //passwordSaltDispose 密码加盐 p 密码原始字符串

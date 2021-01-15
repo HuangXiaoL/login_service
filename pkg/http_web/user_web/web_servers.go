@@ -14,9 +14,10 @@ func NewRouter() *chi.Mux {
 	hl := logrus.WithField("@type", "http")
 	r.Use(httpkit.LogRequest(hl))
 	r.Use(httpkit.Recoverer(hl))
-
+	//接口
 	r.With(Logruser).Post(`/register`, service.RegisterUserInfo)
 	r.With(Logruser).Post(`/login`, service.UserLogin)
+	r.With(LoginAuth).Delete(`/login`, service.UserLoginOut)
 
 	return r
 }

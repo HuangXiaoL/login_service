@@ -45,3 +45,13 @@ func (u *UserInfo) SelectUserInfoByEmail() (model.UserInfo, error) {
 	}
 	return user, nil
 }
+
+//SelectUserInfoByEmail 根据email 查询用户信息
+func (u *UserInfo) SelectUserInfoByUID() (model.UserInfo, error) {
+	sqlStr := "SELECT uuid, password, password_salt,session_salt,email FROM user_info WHERE  uuid= ?"
+	user := model.UserInfo{}
+	if err := db.Get(&user, sqlStr, u.UserID); err != nil {
+		return model.UserInfo{}, err
+	}
+	return user, nil
+}

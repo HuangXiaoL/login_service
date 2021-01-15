@@ -50,6 +50,18 @@ func FindUserBuyEmail(email string) (model.UserInfo, error) {
 	return us, nil
 }
 
+//FindUserBuyEmail 查询用户，根据用户UID
+func FindUserBuyUID(uid string) (model.UserInfo, error) {
+	uinfo := user_model.UserInfo{}
+	uinfo.UserID = uid
+	logrus.Info(uinfo.UserID)
+	us, err := uinfo.SelectUserInfoByUID()
+	if err != nil { //不存在返回错误信息
+		return model.UserInfo{}, err
+	}
+	return us, nil
+}
+
 //typeJudgment 类型断言
 func typeJudgment(value interface{}) string {
 	var key string

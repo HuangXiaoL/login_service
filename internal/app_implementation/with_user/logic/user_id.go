@@ -57,6 +57,7 @@ func (u *User) Login(login logic.Login, way int) (s string, err error) {
 	if err != nil { //账号不存在
 		return
 	}
+	u.UserID = uInfo.UserID
 	u.PasswordSalt = uInfo.PasswordSalt
 	if uInfo.Password != u.passwordSaltDispose(login.Password) { //提交的密码与数据库记录密码不一致
 		return "", errors.New("Incorrect account or password")
@@ -66,6 +67,23 @@ func (u *User) Login(login logic.Login, way int) (s string, err error) {
 		return
 	}
 	if err = model.LoginSalt(login.Email, sSalt); err != nil {
+		return
+	}
+	return
+}
+
+//LoginOut 退出登录
+func (u *User) LoginOut(token string) (err error) {
+	uInfo, err := model.FindUserBuyUID(u.UserID)
+	if err != nil { //未查询到该用户
+		return
+	}
+	tk, err := jwt.ParseToken(token, []byte(uInfo.SessionSalt))
+	if err != nil {
+		return
+	}
+	if tk.UserID != u.UserID {
+		err = errors.New("this cookie uid not eq to tokenUID")
 		return
 	}
 	return

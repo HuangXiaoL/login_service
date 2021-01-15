@@ -15,4 +15,5 @@ type Login struct {
 type UserBehavior interface {
 	RegisterInfo(Register) (err error) //注册信息
 	Login(Login, int) (string, error)  //登录，生成session salt 生成json web token
+	LoginOut(token string) (err error) //退出登录
 }

@@ -86,16 +86,21 @@ func NewPassword(w http.ResponseWriter, r *http.Request) {
 		logrus.Info(err)
 		httpkit.WrapError(err).WithStatus(http.StatusBadRequest).Panic()
 	}
+
 	//获得参数
 	req := struct_logic.ChangePassword{}
-	_ = r.ParseForm()
-	if err := httpkit.ScanValues(&req, r.PostForm); err != nil { //绑定参数
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		httpkit.WrapError(err).WithHeader("err", "Incorrect parameter, missing parameter, parameter content, or type").WithStatus(http.StatusBadRequest).Panic()
 	}
-	err := json.NewDecoder(r.Body).Decode(&req) // 解析json 赋值结构体
-	if err != nil {
-
-	}
+	logrus.Printf("%+v", req)
+	u := realize_logic.User{}
+	uid, _ := r.Cookie("uid")
+	u.UserID = uid.Value
 	//处理参数
+	if err := u.MyPassword(req.Password); err != nil {
+		httpkit.WrapError(err).WithStatus(http.StatusBadRequest).Panic() //处理失败
+	}
+
 	//下行结果
+	w.WriteHeader(http.StatusNoContent)
 }

@@ -1,6 +1,7 @@
 package user_model
 
 import (
+	"github.com/sirupsen/logrus"
 	"gitlab.haochang.tv/huangxiaolei/login_service/internal/app_structure/with_user_structure/model"
 )
 
@@ -54,4 +55,15 @@ func (u *UserInfo) SelectUserInfoByUID() (model.UserInfo, error) {
 		return model.UserInfo{}, err
 	}
 	return user, nil
+}
+
+//UpdatePasswordAndPasswordSaltByUID 修改密码和密码盐
+func (u *UserInfo) UpdatePasswordAndPasswordSaltByUID() (err error) {
+	logrus.Printf("%+v", u)
+	sqlStr := "UPDATE user_info SET password = ?,password_salt = ? WHERE uuid = ?"
+	_, err = db.Exec(sqlStr, u.Password, u.PasswordSalt, u.UserID)
+	if err != nil {
+		return
+	}
+	return
 }

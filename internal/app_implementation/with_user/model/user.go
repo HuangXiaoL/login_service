@@ -29,9 +29,9 @@ func Register(u map[string]interface{}) error {
 }
 
 //LoginSalt 设置登录盐 session salt
-func LoginSalt(e string, salt string) (err error) {
+func LoginSalt(email string, salt string) (err error) {
 	uinfo := user_model.Get()
-	uinfo.Email = e
+	uinfo.Email = email
 	uinfo.SessionSalt = salt
 	if err = uinfo.CreateUserLoginInfoByEmail(); err != nil {
 		return err
@@ -60,6 +60,18 @@ func FindUserBuyUID(uid string) (model.UserInfo, error) {
 		return model.UserInfo{}, err
 	}
 	return us, nil
+}
+
+//UpdateMyPassword 更新密码
+func UpdateMyPassword(uid, newPassword, passwordSalt string) (err error) {
+	uinfo := user_model.UserInfo{}
+	uinfo.UserID = uid
+	uinfo.Password = newPassword
+	uinfo.PasswordSalt = passwordSalt
+	if err = uinfo.UpdatePasswordAndPasswordSaltByUID(); err != nil {
+		return
+	}
+	return
 }
 
 //typeJudgment 类型断言

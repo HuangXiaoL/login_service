@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/sirupsen/logrus"
+
 	"gitlab.haochang.tv/huangxiaolei/login_service/pkg/jwt"
 
 	"github.com/go-basic/uuid"
@@ -89,9 +91,15 @@ func (u *User) VerifyTheUser(token string) (err error) {
 	return
 }
 
-//MyPassword 处理自己的密码 newPWD 新密码
-func (u *User) MyPassword(newPWD string) {
-
+//MyPassword 更新密码 newPWD 新密码
+func (u *User) MyPassword(newPWD string) (err error) {
+	logrus.Println(newPWD)
+	u.PasswordSalt = uuid.New()                // 生成新的加密盐
+	u.Password = u.passwordSaltDispose(newPWD) //生成新的加密字符串
+	if err = model.UpdateMyPassword(u.UserID, u.Password, u.PasswordSalt); err != nil {
+		return
+	}
+	return
 }
 
 //passwordSaltDispose 密码加盐 p 密码原始字符串

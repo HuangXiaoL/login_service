@@ -67,10 +67,6 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 
 //UserLoginOut 用户退出登录
 func UserLoginOut(w http.ResponseWriter, r *http.Request) {
-	if err := authenticationToken(r); err != nil {
-		logrus.Info(err)
-		httpkit.WrapError(err).WithStatus(http.StatusBadRequest).Panic()
-	}
 	//3.处理下行
 	t, _ := r.Cookie("token")
 	u, _ := r.Cookie("uid")
@@ -82,17 +78,11 @@ func UserLoginOut(w http.ResponseWriter, r *http.Request) {
 //NewPassword 修改密码
 func NewPassword(w http.ResponseWriter, r *http.Request) {
 
-	if err := authenticationToken(r); err != nil {
-		logrus.Info(err)
-		httpkit.WrapError(err).WithStatus(http.StatusBadRequest).Panic()
-	}
-
 	//获得参数
 	req := struct_logic.ChangePassword{}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		httpkit.WrapError(err).WithHeader("err", "Incorrect parameter, missing parameter, parameter content, or type").WithStatus(http.StatusBadRequest).Panic()
 	}
-	logrus.Printf("%+v", req)
 	u := realize_logic.User{}
 	uid, _ := r.Cookie("uid")
 	u.UserID = uid.Value
@@ -103,4 +93,14 @@ func NewPassword(w http.ResponseWriter, r *http.Request) {
 
 	//下行结果
 	w.WriteHeader(http.StatusNoContent)
+}
+
+//MyIdentity 账号自身信息
+func MyIdentity(w http.ResponseWriter, r *http.Request) {
+	//获取账号ID
+	u, _ := r.Cookie("uid")
+	user := realize_logic.User{}
+	user.UserID = u.Value
+	user.CurrentUserInformation()
+
 }

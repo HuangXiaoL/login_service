@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"time"
 
+	"gitlab.haochang.tv/huangxiaolei/login_service/internal/app_implementation/with_user/service"
+
 	"github.com/joyparty/httpkit"
 
 	"github.com/sirupsen/logrus"
@@ -31,6 +33,10 @@ func LoginAuth(next http.Handler) http.Handler {
 		u, erruid := r.Cookie("uid")
 		if errtoken != nil || erruid != nil || len(t.Value) < 1 || len(u.Value) < 1 {
 			httpkit.WrapError(errtoken).WithStatus(http.StatusUnauthorized).Panic()
+		}
+		if err := service.AuthenticationToken(r); err != nil {
+			logrus.Info(err)
+			httpkit.WrapError(err).WithStatus(http.StatusBadRequest).Panic()
 		}
 		// 执行前
 		next.ServeHTTP(w, r) // web程序执行

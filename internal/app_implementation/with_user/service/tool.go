@@ -30,7 +30,7 @@ func loginOutDeleteCookie(w http.ResponseWriter, cookie *http.Cookie) {
 }
 
 //authenticationToken 验证令牌与UID
-func authenticationToken(r *http.Request) error {
+func AuthenticationToken(r *http.Request) error {
 	//1.接收值
 	t, _ := r.Cookie("token")
 	u, _ := r.Cookie("uid")

@@ -12,12 +12,23 @@ type Login struct {
 	Password string `valid:"optional"`
 	Remember int    `valid:""`
 }
+
+//ChangePassword 修改密码所需参数
 type ChangePassword struct {
 	Password string `json:"new_password" valid:"optional"`
+}
+
+//UserInfo 用户信息，查询用户信息下行数据
+type UserInfo struct {
+	ID       string //用户ID
+	Email    string //邮箱
+	CreateAt int    // 创建时间
+	Role     string //权限角色名称
 }
 type UserBehavior interface {
 	RegisterInfo(Register) (err error)      //注册信息
 	Login(Login, int) (string, error)       //登录，生成session salt 生成json web token
 	VerifyTheUser(token string) (err error) //验证用户token和UID的正确性，确保token 和UID 匹配
 	MyPassword(newPWD string) (err error)   //处理用户自己的密码
+	CurrentUserInformation()                //获取该登录账号的信息，包括--用户ID，邮箱，创建时间，权限角色名称
 }

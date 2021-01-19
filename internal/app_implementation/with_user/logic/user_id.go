@@ -102,6 +102,15 @@ func (u *User) MyPassword(newPWD string) (err error) {
 	return
 }
 
+//CurrentUserInformation 当前用户信息
+func (u *User) CurrentUserInformation() {
+	_, _, err := model.FindUserInfoAndRoleBuyUID(u.UserID)
+	if err != nil {
+
+	}
+	logrus.Printf("%+v", u)
+}
+
 //passwordSaltDispose 密码加盐 p 密码原始字符串
 func (u *User) passwordSaltDispose(p string) string {
 	data := []byte(p + u.PasswordSalt)

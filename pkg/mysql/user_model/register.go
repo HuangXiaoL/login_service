@@ -1,7 +1,6 @@
 package user_model
 
 import (
-	"github.com/sirupsen/logrus"
 	"gitlab.haochang.tv/huangxiaolei/login_service/internal/app_structure/with_user_structure/model"
 )
 
@@ -49,7 +48,7 @@ func (u *UserInfo) SelectUserInfoByEmail() (model.UserInfo, error) {
 
 //SelectUserInfoByEmail 根据email 查询用户信息
 func (u *UserInfo) SelectUserInfoByUID() (model.UserInfo, error) {
-	sqlStr := "SELECT uuid, password, password_salt,session_salt,email FROM user_info WHERE  uuid= ?"
+	sqlStr := "SELECT uuid, password, password_salt,session_salt,email,create_time FROM user_info WHERE  uuid= ?"
 	user := model.UserInfo{}
 	if err := db.Get(&user, sqlStr, u.UserID); err != nil {
 		return model.UserInfo{}, err
@@ -59,11 +58,20 @@ func (u *UserInfo) SelectUserInfoByUID() (model.UserInfo, error) {
 
 //UpdatePasswordAndPasswordSaltByUID 修改密码和密码盐
 func (u *UserInfo) UpdatePasswordAndPasswordSaltByUID() (err error) {
-	logrus.Printf("%+v", u)
 	sqlStr := "UPDATE user_info SET password = ?,password_salt = ? WHERE uuid = ?"
 	_, err = db.Exec(sqlStr, u.Password, u.PasswordSalt, u.UserID)
 	if err != nil {
 		return
 	}
 	return
+}
+
+//SelectRoleByID 根据ID 查询角色
+func (u *UserInfo) SelectRoleByID() (model.Role, error) {
+	sqlStr := "SELECT   role_name,role_auth FROM role WHERE  id= ?"
+	user := model.Role{}
+	if err := db.Get(&user, sqlStr, u.Email); err != nil {
+		return model.Role{}, err
+	}
+	return user, nil
 }

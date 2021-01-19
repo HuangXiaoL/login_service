@@ -15,10 +15,13 @@ func NewRouter() *chi.Mux {
 	r.Use(httpkit.LogRequest(hl))
 	r.Use(httpkit.Recoverer(hl))
 	//接口
-	r.With(Logruser).Post(`/register`, service.RegisterUserInfo)
-	r.With(Logruser).Post(`/login`, service.UserLogin)
-	r.With(LoginAuth).Delete(`/login`, service.UserLoginOut)
-	r.With(LoginAuth).Post(`/my/password`, service.NewPassword)
+	r.With(LoginAuth).Get(`/my/identity`, service.MyIdentity) // 本账号信息接口
+
+	r.With(Logruser).Post(`/register`, service.RegisterUserInfo) //注册账号
+	r.With(Logruser).Post(`/login`, service.UserLogin)           // 账号登录
+	r.With(LoginAuth).Post(`/my/password`, service.NewPassword)  //修改密码
+
+	r.With(LoginAuth).Delete(`/login`, service.UserLoginOut) // 退出登录
 
 	return r
 }

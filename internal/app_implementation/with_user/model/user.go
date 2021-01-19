@@ -62,6 +62,23 @@ func FindUserBuyUID(uid string) (model.UserInfo, error) {
 	return us, nil
 }
 
+//FindUserInfoAndRoleBuyUID 查询用户信息和角色根据用户UID
+func FindUserInfoAndRoleBuyUID(uid string) (model.UserInfo, model.Role, error) {
+	uinfo := user_model.UserInfo{}
+	uinfo.UserID = uid
+	info, err := uinfo.SelectUserInfoByUID()
+	if err != nil {
+		return model.UserInfo{}, model.Role{}, err
+	}
+	uinfo.Role = info.Role
+	role, err := uinfo.SelectRoleByID()
+	if err != nil {
+		return model.UserInfo{}, model.Role{}, err
+	}
+	return info, role, nil
+
+}
+
 //UpdateMyPassword 更新密码
 func UpdateMyPassword(uid, newPassword, passwordSalt string) (err error) {
 	uinfo := user_model.UserInfo{}

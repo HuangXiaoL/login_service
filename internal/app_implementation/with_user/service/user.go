@@ -101,6 +101,13 @@ func MyIdentity(w http.ResponseWriter, r *http.Request) {
 	u, _ := r.Cookie("uid")
 	user := realize_logic.User{}
 	user.UserID = u.Value
-	user.CurrentUserInformation()
-
+	result, err := user.CurrentUserInformation()
+	if err != nil {
+		httpkit.WrapError(err).WithStatus(http.StatusBadRequest).Panic() //处理失败
+	}
+	buf, err := json.MarshalIndent(result, "", "    ") //格式化编码
+	if err != nil {
+		httpkit.WrapError(err).WithStatus(http.StatusBadRequest).Panic() //处理失败
+	}
+	httpkit.Render.String(w, 200, string(buf))
 }

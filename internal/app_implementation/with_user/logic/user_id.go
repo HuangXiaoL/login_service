@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"time"
 
 	"github.com/sirupsen/logrus"
 
@@ -103,12 +104,23 @@ func (u *User) MyPassword(newPWD string) (err error) {
 }
 
 //CurrentUserInformation 当前用户信息
-func (u *User) CurrentUserInformation() {
-	_, _, err := model.FindUserInfoAndRoleBuyUID(u.UserID)
+func (u *User) CurrentUserInformation() (logic.UserInfo, error) {
+	info, role, err := model.FindUserInfoAndRoleBuyUID(u.UserID)
 	if err != nil {
-
+		return logic.UserInfo{}, err
 	}
-	logrus.Printf("%+v", u)
+	timeTemplate1 := "2006-01-02 15:04:05" //golang 模板 时间戳 常规类型
+	stamp, err := time.ParseInLocation(timeTemplate1, info.CreateTime, time.Local)
+	if err != nil {
+		return logic.UserInfo{}, err
+	}
+	us := logic.UserInfo{}
+	us.ID = info.UserID
+	us.Email = info.Email
+	us.CreateAt = stamp.Unix()
+	us.Role = role.RoleName
+
+	return us, nil
 }
 
 //passwordSaltDispose 密码加盐 p 密码原始字符串

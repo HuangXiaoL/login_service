@@ -61,6 +61,9 @@ func (u *User) Login(login logic.Login, way int) (s string, err error) {
 	if err != nil { //账号不存在
 		return
 	}
+	if uInfo.LockTime != "" {
+		return "", errors.New("The account is locked")
+	}
 	u.UserID = uInfo.UserID
 	u.PasswordSalt = uInfo.PasswordSalt
 	if uInfo.Password != u.passwordSaltDispose(login.Password) { //提交的密码与数据库记录密码不一致

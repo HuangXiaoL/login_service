@@ -59,7 +59,11 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 	u := &realize_logic.User{}
 	token, err := u.Login(req, 0)
 	if err != nil { // 登录失败。
-		logrus.Println(err)
+		if err.Error() == "The account is locked" {
+			logrus.Info(err)
+			httpkit.WrapError(err).WithStatus(http.StatusLocked).Panic()
+		}
+		logrus.Info(err)
 		httpkit.WrapError(err).WithStatus(http.StatusUnauthorized).Panic()
 	}
 	loginSuccessfullyIssuedCookie(w, "token", token, req.Remember)
@@ -154,7 +158,7 @@ func UnLockUser(w http.ResponseWriter, r *http.Request) {
 		httpkit.WrapError(err).WithStatus(http.StatusForbidden).Panic()
 	}
 	if lockID == result.ID {
-		httpkit.WrapError(err).WithStatus(http.StatusNotAcceptable).Panic() //不允许自己锁定自己
+		httpkit.WrapError(err).WithStatus(http.StatusNotAcceptable).Panic() //不允许自己解锁自己
 	}
 	//锁定处理
 	us := realize_logic.User{}

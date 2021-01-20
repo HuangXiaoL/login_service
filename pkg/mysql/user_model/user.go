@@ -40,7 +40,7 @@ func (u *UserInfo) CreateUserLoginInfoByEmail() (err error) {
 
 //SelectUserInfoByEmail 根据email 查询用户信息
 func (u *UserInfo) SelectUserInfoByEmail() (model.UserInfo, error) {
-	sqlStr := "SELECT uuid, password, password_salt,email FROM user_info WHERE  email= ?"
+	sqlStr := "SELECT uuid, password, password_salt,email,lock_time FROM user_info WHERE  email= ?"
 	user := model.UserInfo{}
 	if err := db.Get(&user, sqlStr, u.Email); err != nil {
 		return model.UserInfo{}, err

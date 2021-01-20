@@ -17,11 +17,16 @@ func NewRouter() *chi.Mux {
 	//接口
 	r.With(LoginAuth).Get(`/my/identity`, service.MyIdentity) // 本账号信息接口
 
-	r.With(Logruser).Post(`/register`, service.RegisterUserInfo) //注册账号
-	r.With(Logruser).Post(`/login`, service.UserLogin)           // 账号登录
-	r.With(LoginAuth).Post(`/my/password`, service.NewPassword)  //修改密码
+	r.With(Logruser).Post(`/register`, service.RegisterUserInfo)      //注册账号
+	r.With(Logruser).Post(`/login`, service.UserLogin)                // 账号登录
+	r.With(LoginAuth).Post(`/my/password`, service.NewPassword)       //修改密码
+	r.With(LoginAuth).Post(`/user/:userID/lock`, service.NewPassword) //修改密码
 
 	r.With(LoginAuth).Delete(`/login`, service.UserLoginOut) // 退出登录
 
+	r.Route("/user/{userID}", func(r chi.Router) {
+		r.Use(LoginAuth)
+		r.Post("/lock", service.LockUser) // POST /user/123/lock
+	})
 	return r
 }

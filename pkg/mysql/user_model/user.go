@@ -13,6 +13,7 @@ type UserInfo struct {
 	model.UserInfo
 }
 
+//Get 获取结构体
 func Get() *UserInfo {
 	return &UserInfo{}
 }
@@ -76,4 +77,14 @@ func (u *UserInfo) SelectRoleByID() (model.Role, error) {
 		return model.Role{}, err
 	}
 	return role, nil
+}
+
+//UpdateUerLockTimeByUID 锁定角色 更新锁定时间
+func (u *UserInfo) UpdateUerLockTimeByUID() (err error) {
+	sqlStr := "UPDATE user_info SET lock_time = ? WHERE uuid = ?"
+	_, err = db.Exec(sqlStr, u.LockTime, u.UserID)
+	if err != nil {
+		return
+	}
+	return
 }

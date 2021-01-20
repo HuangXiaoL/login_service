@@ -17,7 +17,8 @@ import (
 )
 
 var (
-	_ logic.UserBehavior = (*User)(nil)
+	_             logic.UserBehavior = (*User)(nil)
+	timeTemplate1                    = "2006-01-02 15:04:05" //golang 模板 时间戳 常规类型
 )
 
 //User 注册用户所需结构体
@@ -109,7 +110,7 @@ func (u *User) CurrentUserInformation() (logic.UserInfo, error) {
 	if err != nil {
 		return logic.UserInfo{}, err
 	}
-	timeTemplate1 := "2006-01-02 15:04:05" //golang 模板 时间戳 常规类型
+
 	stamp, err := time.ParseInLocation(timeTemplate1, info.CreateTime, time.Local)
 	if err != nil {
 		return logic.UserInfo{}, err
@@ -128,6 +129,15 @@ func (u *User) passwordSaltDispose(p string) string {
 	data := []byte(p + u.PasswordSalt)
 	has := md5.Sum(data)
 	return fmt.Sprintf("%x", has)
+}
+
+//LockTheAccount 锁定账号
+func (u *User) LockTheAccount(account string) (err error) {
+	nowTime := time.Unix(time.Now().Unix(), 0).Format(timeTemplate1)
+	if err = model.UpdateUerLockTimeByUID(nowTime, account); err != nil {
+		return
+	}
+	return
 }
 
 //structToMap 结构体转 map

@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi"
+
 	realize_logic "gitlab.haochang.tv/huangxiaolei/login_service/internal/app_implementation/with_user/logic"
 
 	"github.com/sirupsen/logrus"
@@ -110,4 +112,30 @@ func MyIdentity(w http.ResponseWriter, r *http.Request) {
 		httpkit.WrapError(err).WithStatus(http.StatusBadRequest).Panic() //处理失败
 	}
 	httpkit.Render.String(w, 200, string(buf))
+}
+
+//LockUser 锁定账号
+func LockUser(w http.ResponseWriter, r *http.Request) {
+	//获取数据，参数效验
+	lockID := chi.URLParam(r, "userID")
+	u, _ := r.Cookie("uid")
+	user := realize_logic.User{}
+	user.UserID = u.Value
+	result, err := user.CurrentUserInformation()
+	if err != nil {
+		httpkit.WrapError(err).WithStatus(http.StatusForbidden).Panic()
+	}
+	if result.Role != "admin" {
+		httpkit.WrapError(err).WithStatus(http.StatusForbidden).Panic()
+	}
+	if lockID == result.ID {
+		httpkit.WrapError(err).WithStatus(http.StatusNotAcceptable).Panic() //不允许自己锁定自己
+	}
+	//锁定处理
+	us := realize_logic.User{}
+	if err := us.LockTheAccount(lockID); err != nil {
+		httpkit.WrapError(err).WithStatus(http.StatusInternalServerError).Panic()
+	}
+	//下行结果
+	w.WriteHeader(http.StatusResetContent)
 }

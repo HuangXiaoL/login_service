@@ -25,4 +25,5 @@ type AccountInformation interface {
 	SelectRoleByID() (Role, error)            //查询角色根据角色ID
 
 	UpdatePasswordAndPasswordSaltByUID() (err error) // 修改密码和密码盐根据uuid
+	UpdateUerLockTimeByUID() (err error)             // 锁定账号
 }

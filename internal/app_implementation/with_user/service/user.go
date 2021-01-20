@@ -139,3 +139,28 @@ func LockUser(w http.ResponseWriter, r *http.Request) {
 	//下行结果
 	w.WriteHeader(http.StatusResetContent)
 }
+
+//UnLockUser 解锁账号
+func UnLockUser(w http.ResponseWriter, r *http.Request) {
+	lockID := chi.URLParam(r, "userID")
+	u, _ := r.Cookie("uid")
+	user := realize_logic.User{}
+	user.UserID = u.Value
+	result, err := user.CurrentUserInformation()
+	if err != nil {
+		httpkit.WrapError(err).WithStatus(http.StatusForbidden).Panic()
+	}
+	if result.Role != "admin" {
+		httpkit.WrapError(err).WithStatus(http.StatusForbidden).Panic()
+	}
+	if lockID == result.ID {
+		httpkit.WrapError(err).WithStatus(http.StatusNotAcceptable).Panic() //不允许自己锁定自己
+	}
+	//锁定处理
+	us := realize_logic.User{}
+	if err := us.UNLockTheAccount(lockID); err != nil {
+		httpkit.WrapError(err).WithStatus(http.StatusInternalServerError).Panic()
+	}
+	//下行结果
+	w.WriteHeader(http.StatusResetContent)
+}

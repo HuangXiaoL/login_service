@@ -26,7 +26,8 @@ func NewRouter() *chi.Mux {
 
 	r.Route("/user/{userID}", func(r chi.Router) {
 		r.Use(LoginAuth)
-		r.Post("/lock", service.LockUser) // POST /user/123/lock
+		r.Post("/lock", service.LockUser)     // POST /user/123/lock  锁定账号
+		r.Delete("/lock", service.UnLockUser) // Delete /user/123/lock  解除锁定
 	})
 	return r
 }

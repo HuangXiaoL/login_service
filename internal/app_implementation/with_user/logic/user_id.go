@@ -140,6 +140,15 @@ func (u *User) LockTheAccount(account string) (err error) {
 	return
 }
 
+//UNLockTheAccount 解锁账号
+func (u *User) UNLockTheAccount(account string) (err error) {
+	nowTime := ""
+	if err = model.UpdateUerLockTimeByUID(nowTime, account); err != nil {
+		return
+	}
+	return
+}
+
 //structToMap 结构体转 map
 func (u User) structToMap() map[string]interface{} {
 	obj1 := reflect.TypeOf(u)

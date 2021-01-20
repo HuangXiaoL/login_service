@@ -54,7 +54,6 @@ func FindUserBuyEmail(email string) (model.UserInfo, error) {
 func FindUserBuyUID(uid string) (model.UserInfo, error) {
 	uinfo := user_model.Get()
 	uinfo.UserID = uid
-	logrus.Info(uinfo.UserID)
 	us, err := uinfo.SelectUserInfoByUID()
 	if err != nil { //不存在返回错误信息
 		return model.UserInfo{}, err
@@ -94,9 +93,30 @@ func UpdateMyPassword(uid, newPassword, passwordSalt string) (err error) {
 //UpdateUerLockTimeByUID 根据用户ID更新用户锁定时间
 func UpdateUerLockTimeByUID(nowTime, account string) (err error) {
 	uinfo := user_model.Get()
-	uinfo.LockTime = nowTime                              // 锁定时间
+	uinfo.LockTime.String = nowTime                       // 锁定时间
 	uinfo.UserID = account                                // 锁定账号
 	if err = uinfo.UpdateUerLockTimeByUID(); err != nil { // 更新数据
+		return
+	}
+	return
+}
+
+// FindRoleBuyRoleName 根据角色名称查询角色
+func FindRoleBuyRoleName(name string) (role model.Role, err error) {
+	uinfo := user_model.Get()
+	role, err = uinfo.SelectRoleByRoleName(name)
+	if err != nil {
+		return
+	}
+	return
+}
+
+//UpdateUserRole 更新用户的角色
+func UpdateUserRole(uid, roleID string) (err error) {
+	uinfo := user_model.Get()
+	uinfo.UserID = uid
+	uinfo.Role = roleID
+	if err = uinfo.UpdateUerRoleID(); err != nil {
 		return
 	}
 	return

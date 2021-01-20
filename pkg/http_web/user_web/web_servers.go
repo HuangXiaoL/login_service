@@ -25,9 +25,11 @@ func NewRouter() *chi.Mux {
 	r.With(LoginAuth).Delete(`/login`, service.UserLoginOut) // 退出登录
 
 	r.Route("/user/{userID}", func(r chi.Router) {
-		r.Use(LoginAuth)
+		r.Use(AdminAccessLevel)
 		r.Post("/lock", service.LockUser)     // POST /user/123/lock  锁定账号
 		r.Delete("/lock", service.UnLockUser) // Delete /user/123/lock  解除锁定
+		r.Put("/role", service.SetTheRole)    // Delete /user/123/role  定义角色
 	})
+
 	return r
 }

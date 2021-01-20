@@ -1,8 +1,11 @@
 package service
 
 import (
+	"errors"
 	"net/http"
 	"time"
+
+	"github.com/go-chi/chi"
 
 	realize_logic "gitlab.haochang.tv/huangxiaolei/login_service/internal/app_implementation/with_user/logic"
 )
@@ -38,6 +41,25 @@ func AuthenticationToken(r *http.Request) error {
 	us := &realize_logic.User{}
 	us.UserID = u.Value
 	if err := us.VerifyTheUser(t.Value); err != nil {
+		return err
+	}
+	return nil
+}
+
+// 权限等级验证
+func AccessLevel(r *http.Request) error {
+	user := &realize_logic.User{}
+	lockID := chi.URLParam(r, "userID")
+	u, _ := r.Cookie("uid")
+	if lockID == u.Value {
+		return errors.New("Operation account is equal to login account")
+	}
+	user.UserID = u.Value
+	result, err := user.CurrentUserInformation()
+	if err != nil {
+		return err
+	}
+	if result.Role != "admin" {
 		return err
 	}
 	return nil

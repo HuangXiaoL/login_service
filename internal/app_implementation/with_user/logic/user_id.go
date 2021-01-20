@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"time"
 
+	"gitlab.haochang.tv/huangxiaolei/login_service/internal/app_implementation/with_user/custom_error"
+
 	"github.com/sirupsen/logrus"
 
 	"gitlab.haochang.tv/huangxiaolei/login_service/pkg/jwt"
@@ -61,8 +63,8 @@ func (u *User) Login(login logic.Login, way int) (s string, err error) {
 	if err != nil { //账号不存在
 		return
 	}
-	if uInfo.LockTime != "" {
-		return "", errors.New("The account is locked")
+	if uInfo.LockTime.String != "" {
+		return "", errors.New(custom_error.USER_LOCK)
 	}
 	u.UserID = uInfo.UserID
 	u.PasswordSalt = uInfo.PasswordSalt
@@ -150,6 +152,24 @@ func (u *User) UNLockTheAccount(account string) (err error) {
 		return
 	}
 	return
+}
+
+//SetUserRole 设置用户 的角色, uid 用户id ，name 是role 的名称
+func (u *User) SetUserRole(uid, name string) error {
+	_, err := model.FindUserBuyUID(uid)
+	if err != nil {
+		logrus.Println(err)
+		return errors.New(custom_error.NO_USER)
+	}
+	role, err := model.FindRoleBuyRoleName(name)
+	if err != nil {
+		logrus.Println(err)
+		return errors.New(custom_error.NO_ROLE)
+	}
+	if err := model.UpdateUserRole(uid, role.RoleID); err != nil {
+		return err
+	}
+	return nil
 }
 
 //structToMap 结构体转 map

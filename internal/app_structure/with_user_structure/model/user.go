@@ -1,16 +1,19 @@
 package model
 
+import "database/sql"
+
 type UserInfo struct {
-	UserID       string `db:"uuid"`          //用户ID
-	Password     string `db:"password"`      //用户密码
-	PasswordSalt string `db:"password_salt"` //用户密码盐
-	SessionSalt  string `db:"session_salt"`  //用户密码盐
-	Email        string `db:"email"`         //用户邮箱
-	CreateTime   string `db:"create_time"`   // 创建时间
-	Role         string `db:"role"`          //角色ID
-	LockTime     string `db:"lock_time"`     // 锁定时间
+	UserID       string         `db:"uuid"`          //用户ID
+	Password     string         `db:"password"`      //用户密码
+	PasswordSalt string         `db:"password_salt"` //用户密码盐
+	SessionSalt  string         `db:"session_salt"`  //用户密码盐
+	Email        string         `db:"email"`         //用户邮箱
+	CreateTime   string         `db:"create_time"`   // 创建时间
+	Role         string         `db:"role"`          //角色ID
+	LockTime     sql.NullString `db:"lock_time"`     // 锁定时间
 }
 type Role struct {
+	RoleID   string `db:"id"`        //角色名称
 	RoleName string `db:"role_name"` //角色名称
 	RoleAuth string `db:"role_auth"` //角色权限
 }

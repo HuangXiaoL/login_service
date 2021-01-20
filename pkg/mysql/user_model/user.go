@@ -1,7 +1,6 @@
 package user_model
 
 import (
-	"github.com/sirupsen/logrus"
 	"gitlab.haochang.tv/huangxiaolei/login_service/internal/app_structure/with_user_structure/model"
 )
 
@@ -48,7 +47,7 @@ func (u *UserInfo) SelectUserInfoByEmail() (model.UserInfo, error) {
 	return user, nil
 }
 
-//SelectUserInfoByEmail 根据email 查询用户信息
+//SelectUserInfoByUID 根据UID 查询用户信息
 func (u *UserInfo) SelectUserInfoByUID() (model.UserInfo, error) {
 	sqlStr := "SELECT uuid, password, password_salt,session_salt,email,role,create_time FROM user_info WHERE  uuid= ?"
 	user := model.UserInfo{}
@@ -70,10 +69,19 @@ func (u *UserInfo) UpdatePasswordAndPasswordSaltByUID() (err error) {
 
 //SelectRoleByID 根据ID 查询角色
 func (u *UserInfo) SelectRoleByID() (model.Role, error) {
-	logrus.Printf("%+v", u)
-	sqlStr := "SELECT   role_name,role_auth FROM role WHERE  id= ?"
+	sqlStr := "SELECT id,role_name,role_auth FROM role WHERE  id= ?"
 	role := model.Role{}
 	if err := db.Get(&role, sqlStr, u.Role); err != nil {
+		return model.Role{}, err
+	}
+	return role, nil
+}
+
+//SelectRoleByRoleName 根据  名称  查询角色
+func (u *UserInfo) SelectRoleByRoleName(name string) (model.Role, error) {
+	sqlStr := "SELECT  id,role_name,role_auth FROM role WHERE  role_name = ?"
+	role := model.Role{}
+	if err := db.Get(&role, sqlStr, name); err != nil {
 		return model.Role{}, err
 	}
 	return role, nil
@@ -83,6 +91,16 @@ func (u *UserInfo) SelectRoleByID() (model.Role, error) {
 func (u *UserInfo) UpdateUerLockTimeByUID() (err error) {
 	sqlStr := "UPDATE user_info SET lock_time = ? WHERE uuid = ?"
 	_, err = db.Exec(sqlStr, u.LockTime, u.UserID)
+	if err != nil {
+		return
+	}
+	return
+}
+
+//UpdateUerRoleID 更新用户的角色
+func (u *UserInfo) UpdateUerRoleID() (err error) {
+	sqlStr := "UPDATE user_info SET role = ? WHERE uuid = ?"
+	_, err = db.Exec(sqlStr, u.Role, u.UserID)
 	if err != nil {
 		return
 	}

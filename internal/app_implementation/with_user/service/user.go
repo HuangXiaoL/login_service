@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"gitlab.haochang.tv/huangxiaolei/login_service/internal/app_implementation/with_user/custom_error"
+
 	"github.com/go-chi/chi"
 
 	realize_logic "gitlab.haochang.tv/huangxiaolei/login_service/internal/app_implementation/with_user/logic"
@@ -59,7 +61,7 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 	u := &realize_logic.User{}
 	token, err := u.Login(req, 0)
 	if err != nil { // 登录失败。
-		if err.Error() == "The account is locked" {
+		if err.Error() == custom_error.USER_LOCK {
 			logrus.Info(err)
 			httpkit.WrapError(err).WithStatus(http.StatusLocked).Panic()
 		}
@@ -122,19 +124,6 @@ func MyIdentity(w http.ResponseWriter, r *http.Request) {
 func LockUser(w http.ResponseWriter, r *http.Request) {
 	//获取数据，参数效验
 	lockID := chi.URLParam(r, "userID")
-	u, _ := r.Cookie("uid")
-	user := realize_logic.User{}
-	user.UserID = u.Value
-	result, err := user.CurrentUserInformation()
-	if err != nil {
-		httpkit.WrapError(err).WithStatus(http.StatusForbidden).Panic()
-	}
-	if result.Role != "admin" {
-		httpkit.WrapError(err).WithStatus(http.StatusForbidden).Panic()
-	}
-	if lockID == result.ID {
-		httpkit.WrapError(err).WithStatus(http.StatusNotAcceptable).Panic() //不允许自己锁定自己
-	}
 	//锁定处理
 	us := realize_logic.User{}
 	if err := us.LockTheAccount(lockID); err != nil {
@@ -167,4 +156,29 @@ func UnLockUser(w http.ResponseWriter, r *http.Request) {
 	}
 	//下行结果
 	w.WriteHeader(http.StatusResetContent)
+}
+
+//SetTheRole 设置角色
+func SetTheRole(w http.ResponseWriter, r *http.Request) {
+	// 参数获取
+	lockID := chi.URLParam(r, "userID") //被设置的用户ID
+	req := struct_logic.SetRole{}       //设置的角色参数
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		httpkit.WrapError(err).WithHeader("err", "Incorrect parameter, missing parameter, parameter content, or type").WithStatus(http.StatusBadRequest).Panic()
+	}
+	//数据处理
+	user := realize_logic.User{}
+	if err := user.SetUserRole(lockID, req.Role); err != nil {
+		if err.Error() == custom_error.NO_USER { //查询用户失败了
+			logrus.Println(err)
+			httpkit.WrapError(err).WithStatus(http.StatusNotFound).Panic()
+		}
+		if err.Error() == custom_error.NO_ROLE { //查询角色失败了
+			logrus.Println(err)
+			httpkit.WrapError(err).WithStatus(http.StatusBadRequest).Panic()
+		}
+		httpkit.WrapError(err).WithStatus(http.StatusNotFound).Panic()
+	}
+	//下行结果
+	w.WriteHeader(http.StatusNoContent)
 }

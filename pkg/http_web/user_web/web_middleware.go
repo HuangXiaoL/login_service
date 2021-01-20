@@ -26,7 +26,7 @@ func Logruser(next http.Handler) http.Handler {
 
 }
 
-// Logruser 中间件 401 未登录，禁止匿名访问
+// LoginAuth 中间件 401 未登录，禁止匿名访问
 func LoginAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		t, errtoken := r.Cookie("token")
@@ -37,6 +37,32 @@ func LoginAuth(next http.Handler) http.Handler {
 		if err := service.AuthenticationToken(r); err != nil {
 			logrus.Info(err)
 			httpkit.WrapError(err).WithStatus(http.StatusBadRequest).Panic()
+		}
+		// 执行前
+		next.ServeHTTP(w, r) // web程序执行
+	})
+
+}
+
+// AdminAccessLevel 中间件 Admin 权限验证的中间件
+func AdminAccessLevel(next http.Handler) http.Handler {
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		t, errtoken := r.Cookie("token")
+		u, erruid := r.Cookie("uid")
+		if errtoken != nil || erruid != nil || len(t.Value) < 1 || len(u.Value) < 1 {
+			httpkit.WrapError(errtoken).WithStatus(http.StatusUnauthorized).Panic()
+		}
+		if err := service.AuthenticationToken(r); err != nil {
+			logrus.Info(err)
+			httpkit.WrapError(err).WithStatus(http.StatusBadRequest).Panic()
+		}
+		if err := service.AccessLevel(r); err != nil {
+			if err.Error() == "Operation account is equal to login account" {
+				httpkit.WrapError(err).WithStatus(http.StatusNotAcceptable).Panic()
+			}
+			httpkit.WrapError(err).WithStatus(http.StatusForbidden).Panic()
 		}
 		// 执行前
 		next.ServeHTTP(w, r) // web程序执行

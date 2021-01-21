@@ -196,3 +196,13 @@ func DefaultPassword(w http.ResponseWriter, r *http.Request) {
 	//下行结果
 	w.WriteHeader(http.StatusNoContent)
 }
+
+//TestEditor
+func TestEditor(w http.ResponseWriter, r *http.Request) {
+	logrus.Println("TestEditor")
+}
+
+///TestManager
+func TestManager(w http.ResponseWriter, r *http.Request) {
+
+}

@@ -15,6 +15,10 @@ func NewRouter() *chi.Mux {
 	r.Use(httpkit.LogRequest(hl))
 	r.Use(httpkit.Recoverer(hl))
 	//接口
+
+	r.With(EditorAccessLevel).Get("/test/editor", service.TestEditor)    //测试权限
+	r.With(ManagerAccessLevel).Get("/test/manager", service.TestManager) // 测试权限
+
 	r.With(LoginAuth).Get(`/my/identity`, service.MyIdentity) // 本账号信息接口
 
 	r.With(Logruser).Post(`/register`, service.RegisterUserInfo)      //注册账号
@@ -31,6 +35,5 @@ func NewRouter() *chi.Mux {
 		r.Put("/role", service.SetTheRole)             // Put /user/123/role  定义角色
 		r.Delete("/password", service.DefaultPassword) // Delete user/123/password  重置密码
 	})
-
 	return r
 }

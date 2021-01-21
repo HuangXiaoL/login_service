@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/go-chi/chi"
 
 	realize_logic "gitlab.haochang.tv/huangxiaolei/login_service/internal/app_implementation/with_user/logic"
@@ -59,8 +61,9 @@ func AdminLevel(r *http.Request) error {
 	if err != nil {
 		return err
 	}
+	logrus.Println(result.Role)
 	if result.Role != "admin" {
-		return err
+		return errors.New("Role permissions error")
 	}
 	return nil
 }
@@ -78,8 +81,9 @@ func ManagerLevel(r *http.Request) error {
 	if err != nil {
 		return err
 	}
+	logrus.Println(result.Role)
 	if result.Role != "manager" {
-		return err
+		return errors.New("Role permissions error")
 	}
 	return nil
 }
@@ -97,8 +101,9 @@ func EditorLevel(r *http.Request) error {
 	if err != nil {
 		return err
 	}
+	logrus.Println(result.Role)
 	if result.Role != "editor" {
-		return err
+		return errors.New("Role permissions error")
 	}
 	return nil
 }

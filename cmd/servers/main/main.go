@@ -56,12 +56,12 @@ func initLink(c *Config) {
 	if err := userMysql.InitMysql(c.Mysql); err != nil { //初始化数据库操作
 		logrus.Panicln(err)
 	}
-	logrus.Println("数据库初始化完成")
+	logrus.Info("数据库初始化完成")
 	if err := userRedis.InitRedis(c.Redis); err != nil { //初始化数据库操作
 		logrus.Panicln(err)
 	}
-	logrus.Println("缓存初始化完成")
-	logrus.Println("Web服务初始化.....")
+	logrus.Info("缓存初始化完成")
+	logrus.Info("Web服务初始化.....")
 	if err := http.ListenAndServe(c.HTTP.Address, user.NewRouter()); err != nil {
 		logrus.WithError(err).Panic("Web服务初始化.....失败")
 	}

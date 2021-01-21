@@ -182,3 +182,17 @@ func SetTheRole(w http.ResponseWriter, r *http.Request) {
 	//下行结果
 	w.WriteHeader(http.StatusNoContent)
 }
+
+//DefaultPassword 设置为默认的密码---重置密码
+func DefaultPassword(w http.ResponseWriter, r *http.Request) {
+	// 获取参数
+	lockID := chi.URLParam(r, "userID") //被设置的用户ID
+	//处理参数
+	u := realize_logic.User{}
+	u.UserID = lockID
+	if err := u.MyPassword("123456"); err != nil {
+		httpkit.WrapError(err).WithStatus(http.StatusBadRequest).Panic() //处理失败
+	}
+	//下行结果
+	w.WriteHeader(http.StatusNoContent)
+}

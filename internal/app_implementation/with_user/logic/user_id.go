@@ -100,7 +100,6 @@ func (u *User) VerifyTheUser(token string) (err error) {
 
 //MyPassword 更新密码 newPWD 新密码
 func (u *User) MyPassword(newPWD string) (err error) {
-	logrus.Println(newPWD)
 	u.PasswordSalt = uuid.New()                // 生成新的加密盐
 	u.Password = u.passwordSaltDispose(newPWD) //生成新的加密字符串
 	if err = model.UpdateMyPassword(u.UserID, u.Password, u.PasswordSalt); err != nil {

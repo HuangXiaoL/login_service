@@ -26,9 +26,10 @@ func NewRouter() *chi.Mux {
 
 	r.Route("/user/{userID}", func(r chi.Router) {
 		r.Use(AdminAccessLevel)
-		r.Post("/lock", service.LockUser)     // POST /user/123/lock  锁定账号
-		r.Delete("/lock", service.UnLockUser) // Delete /user/123/lock  解除锁定
-		r.Put("/role", service.SetTheRole)    // Delete /user/123/role  定义角色
+		r.Post("/lock", service.LockUser)              // POST /user/123/lock  锁定账号
+		r.Delete("/lock", service.UnLockUser)          // Delete /user/123/lock  解除锁定
+		r.Put("/role", service.SetTheRole)             // Put /user/123/role  定义角色
+		r.Delete("/password", service.DefaultPassword) // Delete user/123/password  重置密码
 	})
 
 	return r

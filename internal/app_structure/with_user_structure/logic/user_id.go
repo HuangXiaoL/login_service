@@ -41,4 +41,5 @@ type UserBehavior interface {
 	LockTheAccount(account string) (err error)   //锁定账号 传入参数  需要锁定的账号 account
 	UNLockTheAccount(account string) (err error) //解锁账号 传入参数  需要解锁的账号 account
 	SetUserRole(uid string, name string) error   // 设置账户角色
+	SetDefaultPassword(uid string)               //设置默认密码
 }

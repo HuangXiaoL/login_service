@@ -46,8 +46,8 @@ func AuthenticationToken(r *http.Request) error {
 	return nil
 }
 
-// 权限等级验证
-func AccessLevel(r *http.Request) error {
+// AdminLevel admin  权限等级验证
+func AdminLevel(r *http.Request) error {
 	user := &realize_logic.User{}
 	lockID := chi.URLParam(r, "userID")
 	u, _ := r.Cookie("uid")
@@ -60,6 +60,44 @@ func AccessLevel(r *http.Request) error {
 		return err
 	}
 	if result.Role != "admin" {
+		return err
+	}
+	return nil
+}
+
+// ManagerLevel Manager  权限等级验证
+func ManagerLevel(r *http.Request) error {
+	user := &realize_logic.User{}
+	lockID := chi.URLParam(r, "userID")
+	u, _ := r.Cookie("uid")
+	if lockID == u.Value {
+		return errors.New("Operation account is equal to login account")
+	}
+	user.UserID = u.Value
+	result, err := user.CurrentUserInformation()
+	if err != nil {
+		return err
+	}
+	if result.Role != "manager" {
+		return err
+	}
+	return nil
+}
+
+// EditorLevel Editor  权限等级验证
+func EditorLevel(r *http.Request) error {
+	user := &realize_logic.User{}
+	lockID := chi.URLParam(r, "userID")
+	u, _ := r.Cookie("uid")
+	if lockID == u.Value {
+		return errors.New("Operation account is equal to login account")
+	}
+	user.UserID = u.Value
+	result, err := user.CurrentUserInformation()
+	if err != nil {
+		return err
+	}
+	if result.Role != "editor" {
 		return err
 	}
 	return nil

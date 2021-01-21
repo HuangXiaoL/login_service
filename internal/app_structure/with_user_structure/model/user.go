@@ -2,6 +2,7 @@ package model
 
 import "database/sql"
 
+//UserInfo 用户表信息
 type UserInfo struct {
 	UserID       string         `db:"uuid"`          //用户ID
 	Password     string         `db:"password"`      //用户密码
@@ -12,13 +13,15 @@ type UserInfo struct {
 	Role         string         `db:"role"`          //角色ID
 	LockTime     sql.NullString `db:"lock_time"`     // 锁定时间
 }
+
+//Role 角色表
 type Role struct {
 	RoleID   string `db:"id"`        //角色名称
 	RoleName string `db:"role_name"` //角色名称
 	RoleAuth string `db:"role_auth"` //角色权限
 }
 
-//Account 账号信息操作相关接口
+//AccountInformation 账号信息操作相关接口
 type AccountInformation interface {
 	CreateUserInfo() error                   // 注册用户信息
 	CreateUserLoginInfoByEmail() (err error) //登录状态 session salt 创建

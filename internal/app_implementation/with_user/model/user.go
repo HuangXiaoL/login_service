@@ -4,33 +4,29 @@ import (
 	"encoding/json"
 	"strconv"
 
+	"gitlab.haochang.tv/huangxiaolei/login_service/pkg/mysql/user"
+
 	"github.com/sirupsen/logrus"
 
 	"gitlab.haochang.tv/huangxiaolei/login_service/internal/app_structure/with_user_structure/model"
-
-	"gitlab.haochang.tv/huangxiaolei/login_service/pkg/mysql/user_model"
 )
 
 //Register 注册
 func Register(u map[string]interface{}) error {
 	//组装数据
 	logrus.Println(u)
-	uinfo := user_model.Get()
+	uinfo := user.Get()
 	uinfo.Password = typeJudgment(u["Password"])
 	uinfo.PasswordSalt = typeJudgment(u["PasswordSalt"])
 	uinfo.UserID = typeJudgment(u["UserID"])
 	uinfo.Email = typeJudgment(u["Email"])
 	//创建用户
-	logrus.Printf("%+v", uinfo)
-	if err := uinfo.CreateUserInfo(); err != nil {
-		return err
-	}
-	return nil
+	return uinfo.CreateUserInfo()
 }
 
 //LoginSalt 设置登录盐 session salt
 func LoginSalt(email string, salt string) (err error) {
-	uinfo := user_model.Get()
+	uinfo := user.Get()
 	uinfo.Email = email
 	uinfo.SessionSalt = salt
 	if err = uinfo.CreateUserLoginInfoByEmail(); err != nil {
@@ -41,7 +37,7 @@ func LoginSalt(email string, salt string) (err error) {
 
 //FindUserBuyEmail 查询用户，根据用户邮箱
 func FindUserBuyEmail(email string) (model.UserInfo, error) {
-	uinfo := user_model.Get()
+	uinfo := user.Get()
 	uinfo.Email = email
 	us, err := uinfo.SelectUserInfoByEmail()
 	if err != nil { //不存在返回错误信息
@@ -50,9 +46,9 @@ func FindUserBuyEmail(email string) (model.UserInfo, error) {
 	return us, nil
 }
 
-//FindUserBuyEmail 查询用户，根据用户UID
+//FindUserBuyUID 查询用户，根据用户UID
 func FindUserBuyUID(uid string) (model.UserInfo, error) {
-	uinfo := user_model.Get()
+	uinfo := user.Get()
 	uinfo.UserID = uid
 	us, err := uinfo.SelectUserInfoByUID()
 	if err != nil { //不存在返回错误信息
@@ -63,7 +59,7 @@ func FindUserBuyUID(uid string) (model.UserInfo, error) {
 
 //FindUserInfoAndRoleBuyUID 查询用户信息和角色根据用户UID
 func FindUserInfoAndRoleBuyUID(uid string) (model.UserInfo, model.Role, error) {
-	uinfo := user_model.Get()
+	uinfo := user.Get()
 	uinfo.UserID = uid
 	info, err := uinfo.SelectUserInfoByUID()
 	if err != nil {
@@ -80,7 +76,7 @@ func FindUserInfoAndRoleBuyUID(uid string) (model.UserInfo, model.Role, error) {
 
 //UpdateMyPassword 更新密码
 func UpdateMyPassword(uid, newPassword, passwordSalt string) (err error) {
-	uinfo := user_model.Get()
+	uinfo := user.Get()
 	uinfo.UserID = uid
 	uinfo.Password = newPassword
 	uinfo.PasswordSalt = passwordSalt
@@ -92,7 +88,7 @@ func UpdateMyPassword(uid, newPassword, passwordSalt string) (err error) {
 
 //UpdateUerLockTimeByUID 根据用户ID更新用户锁定时间
 func UpdateUerLockTimeByUID(nowTime, account string) (err error) {
-	uinfo := user_model.Get()
+	uinfo := user.Get()
 	uinfo.LockTime.String = nowTime                       // 锁定时间
 	uinfo.UserID = account                                // 锁定账号
 	if err = uinfo.UpdateUerLockTimeByUID(); err != nil { // 更新数据
@@ -103,7 +99,7 @@ func UpdateUerLockTimeByUID(nowTime, account string) (err error) {
 
 // FindRoleBuyRoleName 根据角色名称查询角色
 func FindRoleBuyRoleName(name string) (role model.Role, err error) {
-	uinfo := user_model.Get()
+	uinfo := user.Get()
 	role, err = uinfo.SelectRoleByRoleName(name)
 	if err != nil {
 		return
@@ -113,7 +109,7 @@ func FindRoleBuyRoleName(name string) (role model.Role, err error) {
 
 //UpdateUserRole 更新用户的角色
 func UpdateUserRole(uid, roleID string) (err error) {
-	uinfo := user_model.Get()
+	uinfo := user.Get()
 	uinfo.UserID = uid
 	uinfo.Role = roleID
 	if err = uinfo.UpdateUerRoleID(); err != nil {

@@ -1,4 +1,4 @@
-package user_web
+package user
 
 import (
 	"github.com/joyparty/httpkit"
@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi"
 )
 
+//NewRouter 路由
 func NewRouter() *chi.Mux {
 	r := chi.NewMux()
 

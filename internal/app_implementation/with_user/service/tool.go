@@ -16,7 +16,7 @@ import (
 func loginSuccessfullyIssuedCookie(w http.ResponseWriter, name string, value string, remember int) {
 	maxAge := int(60 * time.Second)
 	if remember == 1 {
-		maxAge = COOKIE_MAX_MAX_AGE // 七天
+		maxAge = CookieMaxAge // 七天
 	}
 	//3.结果下行
 	cookie := &http.Cookie{
@@ -34,7 +34,7 @@ func loginOutDeleteCookie(w http.ResponseWriter, cookie *http.Cookie) {
 	http.SetCookie(w, cookie)
 }
 
-//authenticationToken 验证令牌与UID
+//AuthenticationToken 验证令牌与UID
 func AuthenticationToken(r *http.Request) error {
 	//1.接收值
 	t, _ := r.Cookie("token")
@@ -42,10 +42,8 @@ func AuthenticationToken(r *http.Request) error {
 	//2.处理值
 	us := &realize_logic.User{}
 	us.UserID = u.Value
-	if err := us.VerifyTheUser(t.Value); err != nil {
-		return err
-	}
-	return nil
+	err := us.VerifyTheUser(t.Value)
+	return err
 }
 
 // AdminLevel admin  权限等级验证

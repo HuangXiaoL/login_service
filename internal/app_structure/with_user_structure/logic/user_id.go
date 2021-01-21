@@ -25,10 +25,10 @@ type SetRole struct {
 
 //UserInfo 用户信息，查询用户信息下行数据
 type UserInfo struct {
-	ID       string `json:"id"`        //用户ID
-	Email    string `json:"email"`     //邮箱
-	CreateAt int64  `json:"create_at"` // 创建时间
-	Role     string `json:"role"`      //权限角色名称
+	ID       string `json:"id"`        //ID 用户ID
+	Email    string `json:"email"`     //Email 邮箱
+	CreateAt int64  `json:"create_at"` //CreateAt 创建时间
+	Role     string `json:"role"`      //Role 权限角色名称
 }
 
 //UserBehavior 用户操作行为

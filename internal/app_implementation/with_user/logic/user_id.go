@@ -165,10 +165,8 @@ func (u *User) SetUserRole(uid, name string) error {
 		logrus.Println(err)
 		return errors.New(custom_error.NO_ROLE)
 	}
-	if err := model.UpdateUserRole(uid, role.RoleID); err != nil {
-		return err
-	}
-	return nil
+	return model.UpdateUserRole(uid, role.RoleID)
+
 }
 
 //structToMap 结构体转 map

@@ -1,4 +1,4 @@
-package user_redis
+package user
 
 import (
 	"fmt"

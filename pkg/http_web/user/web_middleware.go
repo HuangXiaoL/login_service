@@ -1,4 +1,4 @@
-package user_web
+package user
 
 import (
 	"net/http"

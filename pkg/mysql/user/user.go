@@ -1,4 +1,4 @@
-package user_model
+package user
 
 import (
 	"gitlab.haochang.tv/huangxiaolei/login_service/internal/app_structure/with_user_structure/model"

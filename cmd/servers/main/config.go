@@ -5,9 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 
-	"gitlab.haochang.tv/huangxiaolei/login_service/pkg/redis/user_redis"
-
-	"gitlab.haochang.tv/huangxiaolei/login_service/pkg/mysql/user_model"
+	"gitlab.haochang.tv/huangxiaolei/login_service/pkg/mysql/user"
+	user2 "gitlab.haochang.tv/huangxiaolei/login_service/pkg/redis/user"
 
 	"github.com/sirupsen/logrus"
 
@@ -21,8 +20,8 @@ type Config struct {
 	HTTP struct {
 		Address string `toml:"address"`
 	} `toml:"http"`
-	user_model.Mysql `toml:"user_mysql"` //用户数据库的连接MySQL需要的结构参数
-	user_redis.Redis `toml:"user_redis"` //用户数据库的连接MySQL需要的结构参数
+	user.Mysql  `toml:"user_mysql"` //用户数据库的连接MySQL需要的结构参数
+	user2.Redis `toml:"user_redis"` //用户数据库的连接MySQL需要的结构参数
 }
 
 //loadConfigFile 配置文件相关信息载入进来 add 配置文件的路径

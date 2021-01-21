@@ -18,7 +18,8 @@ import (
 	"github.com/joyparty/httpkit"
 )
 
-const COOKIE_MAX_MAX_AGE = int(time.Hour * 24 * 7 / time.Second) //7*24 小时 单位：秒。
+//CookieMaxAge 最大的cookie生存时间
+const CookieMaxAge = int(time.Hour * 24 * 7 / time.Second) //7*24 小时 单位：秒。
 //RegisterUserInfo 注册用户
 func RegisterUserInfo(w http.ResponseWriter, r *http.Request) {
 	//1.上传参数赋值
@@ -197,12 +198,12 @@ func DefaultPassword(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-//TestEditor
+//TestEditor 测试
 func TestEditor(w http.ResponseWriter, r *http.Request) {
 	logrus.Println("TestEditor")
 }
 
-///TestManager
+///TestManager 测试
 func TestManager(w http.ResponseWriter, r *http.Request) {
 
 }
